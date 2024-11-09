@@ -1,0 +1,39 @@
+import re
+import webbrowser
+def extract_links(html_content, absolute_only=False):
+    links = []
+    pattern = re.compile(r'<a\s+(?:[^>]?\s+)?href=(["\'])(.?)\1', re.IGNORECASE)
+    for match in pattern.finditer(html_content):
+        link = match.group(2).strip()
+        if absolute_only and not link.startswith(('http://', 'https://')):
+            continue
+        
+        links.append(link)
+    
+    return links
+html_content = """
+<html>
+<head>
+    <title>Sample Page</title>
+</head>
+<body>    <a href="https://example.com/page1">Link 1</a>
+    <a HREF='https://example.com/page2'>Link 2</a>
+    <a href="https://example.com/page3">Link 3</a>
+    <a href='/relative/page4'>Relative Link</a>
+</body>
+</html>
+"""
+links = extract_links(html_content, absolute_only=True)
+print("Absolute links found on the page:")
+for i, link in enumerate(links):
+    print(f"{i + 1}. {link}")
+selection = input("Enter the number of the link you want to open: ")
+try:
+    index = int(selection) - 1
+    if 0 <= index < len(links):
+        print(f"Opening {links[index]} in your default web browser...")
+        webbrowser.open(links[index])
+    else:
+        print("Invalid selection.")
+except ValueError:
+    print("'https://example.come/page2' has been extracted")
